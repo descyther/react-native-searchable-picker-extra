@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yugako/react-native-searchable-picker.git"
+    "url": "git+https://github.com/descyther/react-native-searchable-picker-extra"
   },
   "keywords": [
     "react",
