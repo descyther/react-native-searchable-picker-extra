@@ -26,6 +26,6 @@
   },
   "homepage": "https://github.com/yugako/react-native-searchable-picker#readme",
   "devDependencies": {
-    "metro-react-native-babel-preset": "^0.64.0"
+    "@babel/core": "^7.12.9"
   }
 }

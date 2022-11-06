@@ -10,7 +10,7 @@ import {
   TouchableNativeFeedback,
 } from "react-native";
 
-const RNSearchablePicker = (({
+const RNSearchablePicker = ({
   placeholder,
   placeholderTextColor,
   emptyMessage,
@@ -23,10 +23,9 @@ const RNSearchablePicker = (({
   listStyles,
   itemStyles,
   flatList = true,
-  ref = null
+  ref = null,
 }) => {
-  
-  const formRef = useRef( ref || null);
+  const formRef = useRef(ref || null);
 
   const [inputValue, setInputValue] = useState(defaultValue);
   const [listVisibility, setListVisibility] = useState(false);
@@ -36,21 +35,22 @@ const RNSearchablePicker = (({
     Platform.OS === "android" ? TouchableNativeFeedback : TouchableHighlight;
 
   const onChange = (val) => {
+    setListVisibility(true);
     setInputValue(val);
     if (val.trim()) {
       // Filtered data
       const filtered = data.filter((item) => item.label.includes(val));
       if (filtered.length) setFilteredData(filtered);
     } else {
-      // Complete data withot filter 
+      // Complete data withot filter
       setFilteredData(data);
     }
   };
 
   const onPress = () => {
     // Open up list of items with filtered data empty
-    setListVisibility(!listVisibility); 
     onChange("");
+    setListVisibility(!listVisibility);
   };
 
   return (
@@ -59,8 +59,8 @@ const RNSearchablePicker = (({
         style={{
           flexDirection: "row",
           alignItems: "center",
-          borderBottomWidth: 1,
-          borderBottomColor: "#ccc",
+          elevation: 2,
+          zIndex: 2,
         }}
       >
         <TextInput
@@ -71,76 +71,99 @@ const RNSearchablePicker = (({
           style={{ flex: 1, ...inputStyles }}
           ref={formRef}
         />
-        <Touchable background={TouchableNativeFeedback.Ripple(null, true)} onPress={onPress}>
-          {listVisibility 
-            ? <Text style={{fontSize: 28, color: '#000', padding: 10}}>&#9652;</Text>
-            : <Text style={{fontSize: 28, color: '#000', padding: 10}}>&#9662;</Text>
-          }
+        <Touchable
+          background={TouchableNativeFeedback.Ripple(null, true)}
+          onPress={onPress}
+        >
+          {listVisibility ? (
+            <Text style={{ fontSize: 28, color: "#000", padding: 10 }}>
+              &#9652;
+            </Text>
+          ) : (
+            <Text style={{ fontSize: 28, color: "#000", padding: 10 }}>
+              &#9662;
+            </Text>
+          )}
         </Touchable>
       </View>
       {listVisibility ? (
-      <View>
-        {Array.isArray(data) && data.length ? (
-          flatList ? (
-          <FlatList
-            nestedScrollEnabled={true}
-            style={{
-              maxHeight: 150,
-              borderWidth: 1,
-              borderColor: '#ccc',
-              marginTop: 5,
-              ...listStyles
-            }}
-            data={filteredData}
-            keyExtractor={(item) => item.value}
-            renderItem={({ item }) => (
-              <Touchable
-                onPress={() => {
-                  onSelect(item);
-                  setInputValue(item.label);
-                  setListVisibility(false);
+        <View>
+          {Array.isArray(data) && data.length ? (
+            flatList ? (
+              <FlatList
+                nestedScrollEnabled={true}
+                style={{
+                  maxHeight: 150,
+                  marginTop: 5,
+                  ...listStyles,
+                }}
+                data={filteredData}
+                keyExtractor={(item) => item.value}
+                renderItem={({ item }) => (
+                  <Touchable
+                    onPress={() => {
+                      onSelect(item);
+                      setInputValue(item.label);
+                      setListVisibility(false);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        paddingVertical: 10,
+                        paddingHorizontal: 5,
+                        ...itemStyles,
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                  </Touchable>
+                )}
+              />
+            ) : (
+              <ScrollView
+                style={{
+                  maxHeight: 150,
+                  marginTop: 5,
+                  ...listStyles,
                 }}
               >
-                <Text style={{ paddingVertical: 10, paddingHorizontal: 5, ...itemStyles }}>
-                  {item.label}
-                </Text>
-              </Touchable>
-            )}
-          />
+                {filteredData.map((item, index) => (
+                  <Touchable
+                    key={index}
+                    onPress={() => {
+                      onSelect(item);
+                      setInputValue(item.label);
+                      setListVisibility(false);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        paddingVertical: 10,
+                        paddingHorizontal: 5,
+                        ...itemStyles,
+                      }}
+                    >
+                      {item.label}
+                    </Text>
+                  </Touchable>
+                ))}
+              </ScrollView>
+            )
           ) : (
-            <ScrollView
+            <Text
               style={{
-                maxHeight: 150,
-                borderWidth: 1,
-                borderColor: '#ccc',
-                marginTop: 5,
-                ...listStyles
+                textAlign: "center",
+                marginVertical: 5,
+                ...emptyMessageStyles,
               }}
             >
-              {filteredData.map((item, index) => (
-                <Touchable
-                  key={index}
-                  onPress={() => {
-                    onSelect(item);
-                    setInputValue(item.label);
-                    setListVisibility(false);
-                  }}
-                >
-                  <Text style={{ paddingVertical: 10, paddingHorizontal: 5, ...itemStyles }}>
-                    {item.label}
-                  </Text>
-                </Touchable>
-              ))}
-            </ScrollView>
-          )
-        ) : (
-          <Text style={{textAlign: 'center', marginVertical: 5, ...emptyMessageStyles}}>{emptyMessage}</Text>
-        )}
-      </View>
+              {emptyMessage}
+            </Text>
+          )}
+        </View>
       ) : null}
     </View>
   );
-});
-
+};
 
 export default RNSearchablePicker;
